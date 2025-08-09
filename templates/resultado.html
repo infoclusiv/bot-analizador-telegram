@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado del Análisis</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        #result-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; }
+        .loading { text-align: center; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Resultado del Análisis</h1>
+    <div id="result-container">
+        <div class="loading">
+            <h3>Análisis en progreso...</h3>
+            <p>Por favor, espera. Los resultados aparecerán aquí automáticamente.</p>
+            <p><strong>Job ID:</strong> {{ job_id }}</p>
+        </div>
+    </div>
+    <hr>
+    <a href="/">Volver al inicio</a>
+
+    <script>
+        const jobId = "{{ job_id }}";
+        
+        async function checkStatus() {
+            try {
+                const response = await fetch(`/status/${jobId}`);
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    clearInterval(intervalId);
+                    const container = document.getElementById('result-container');
+                    container.innerHTML = `<h3>Análisis Completado</h3><pre>${data.result}</pre>`;
+                } else if (data.status === 'failed') {
+                    clearInterval(intervalId);
+                    const container = document.getElementById('result-container');
+                    container.innerHTML = `<h3 class="error">El Análisis Falló</h3><p>Motivo: ${data.result}</p>`;
+                }
+                // Si está 'pending', no hacemos nada y dejamos que el intervalo siga.
+
+            } catch (error) {
+                console.error('Error al consultar el estado:', error);
+                clearInterval(intervalId);
+                const container = document.getElementById('result-container');
+                container.innerHTML = `<h3 class="error">Error de Conexión</h3><p>No se pudo comunicar con el servidor para obtener el resultado.</p>`;
+            }
+        }
+
+        // Preguntar por el estado cada 5 segundos
+        const intervalId = setInterval(checkStatus, 5000);
+
+        // Hacemos una primera consulta inmediata para no esperar 5s si el resultado es muy rápido
+        checkStatus(); 
+    </script>
+</body>
+</html>

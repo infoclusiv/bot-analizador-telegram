@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de YouTube</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .channel { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .channel-name { font-size: 1.2em; }
+        .btn { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Analizador de Canales de YouTube</h1>
+    <p>Selecciona un canal para iniciar el análisis. El proceso puede tardar hasta 2 minutos.</p>
+    <hr>
+    {% for channel in channels %}
+        <div class="channel">
+            <span class="channel-name">{{ channel.channel_name }}</span>
+            <a href="{{ url_for('start_analysis', channel_id=channel.channel_id) }}" class="btn">Analizar</a>
+        </div>
+    {% else %}
+        <p>No se encontraron canales en la base de datos.</p>
+    {% endfor %}
+</body>
+</html>
