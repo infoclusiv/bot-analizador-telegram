@@ -21,7 +21,7 @@ def analyze_with_openrouter(prompt, video_data):
     }
     
     payload = {
-        "model": "google/gemini-flash-1.5", 
+        "model": "openai/gpt-oss-20b:free", 
         "messages": [{"role": "user", "content": full_content}]
     }
 
