@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Análisis</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .status-completed { color: green; font-weight: bold; }
+        .status-failed { color: red; font-weight: bold; }
+        .status-pending { color: orange; font-weight: bold; }
+        .btn { background-color: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Historial de Análisis</h1>
+    <p><a href="/">Volver al inicio para un nuevo análisis</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Canal Analizado</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job[3] }}</td>
+                <td>{{ job[1] or 'N/A' }}</td>
+                <td>
+                    <span class="status-{{ job[2] }}">{{ job[2] }}</span>
+                </td>
+                <td>
+                    {% if job[2] == 'completed' or job[2] == 'failed' %}
+                    <a href="{{ url_for('show_result', job_id=job[0]) }}" class="btn">Ver Resultado</a>
+                    {% else %}
+                    <a href="{{ url_for('show_result', job_id=job[0]) }}" class="btn">Ver Progreso</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">Aún no se ha realizado ningún análisis.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

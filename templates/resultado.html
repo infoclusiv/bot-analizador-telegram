@@ -16,13 +16,13 @@
     <h1>Resultado del Análisis</h1>
     <div id="result-container">
         <div class="loading">
-            <h3>Análisis en progreso...</h3>
+            <h3>Análisis en progreso para: {{ channel_name }}</h3>
             <p>Por favor, espera. Los resultados aparecerán aquí automáticamente.</p>
             <p><strong>Job ID:</strong> {{ job_id }}</p>
         </div>
     </div>
     <hr>
-    <a href="/">Volver al inicio</a>
+    <a href="{{ url_for('historial') }}">Volver al Historial</a>
 
     <script>
         const jobId = "{{ job_id }}";
