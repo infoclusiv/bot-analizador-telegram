@@ -1,4 +1,4 @@
-# youtube_logic.py
+# youtube_logic.py (Versión Corregida)
 import os
 import libsql
 from googleapiclient.discovery import build
@@ -28,21 +28,27 @@ def get_db_connection():
     if not all([DB_URL, DB_AUTH_TOKEN]):
         raise ValueError("DB_URL y DB_AUTH_TOKEN deben estar configurados en el archivo .env")
     conn = libsql.connect(database=DB_URL, auth_token=DB_AUTH_TOKEN)
-    conn.row_factory = libsql.Row
+    # LA LÍNEA QUE DABA EL ERROR HA SIDO ELIMINADA DE AQUÍ
     return conn
 
 def get_all_saved_channels():
     """Obtiene todos los canales de la base de datos de Turso."""
     conn = get_db_connection()
-    channels_raw = conn.execute('SELECT channel_id, channel_name FROM channels ORDER BY channel_name').fetchall()
+    cursor = conn.cursor()
+    cursor.execute('SELECT channel_id, channel_name FROM channels ORDER BY channel_name')
+    channels_raw = cursor.fetchall()
     conn.close()
-    return [dict(row) for row in channels_raw]
+    # AJUSTE: Convertimos manualmente los resultados a diccionarios
+    return [{'channel_id': row[0], 'channel_name': row[1]} for row in channels_raw]
 
 def get_channel_name_from_db(channel_id):
     conn = get_db_connection()
-    channel = conn.execute('SELECT channel_name FROM channels WHERE channel_id = ?', (channel_id,)).fetchone()
+    cursor = conn.cursor()
+    cursor.execute('SELECT channel_name FROM channels WHERE channel_id = ?', (channel_id,))
+    channel = cursor.fetchone()
     conn.close()
-    return channel['channel_name'] if channel else None
+    # AJUSTE: Accedemos al resultado por su posición (0) en lugar de por nombre
+    return channel[0] if channel else None
 
 def get_channel_videos_last_week(channel_id, include_shorts=False):
     """Obtiene los videos de un canal de los últimos 3 días."""
