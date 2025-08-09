@@ -21,7 +21,7 @@ def analyze_with_openrouter(prompt, video_data):
     }
     
     payload = {
-        "model": "openai/gpt-oss-20b:free", 
+        "model": "tngtech/deepseek-r1t2-chimera:free", 
         "messages": [{"role": "user", "content": full_content}]
     }
 
