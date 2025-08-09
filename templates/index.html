@@ -8,21 +8,45 @@
         body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
         .channel { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
         .channel-name { font-size: 1.2em; }
-        .btn { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .actions a, .actions button { text-decoration: none; border-radius: 5px; padding: 10px 15px; margin-left: 10px; }
+        .btn-analyze { background-color: #007bff; color: white; }
+        .btn-delete { background-color: #dc3545; color: white; border: none; cursor: pointer; font-size: 1em; }
+        .flash-message { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; background-color: #d4edda; color: #155724; border-color: #c3e6cb;}
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h1>Analizador de Canales de YouTube</h1>
-    <p><a href="{{ url_for('historial') }}">Ver Historial de Análisis</a></p>
+    <div class="top-nav">
+        <h1>Analizador de Canales</h1>
+        <div>
+            <a href="{{ url_for('add_channel') }}" class="btn-analyze">Añadir Canal</a>
+            <a href="{{ url_for('historial') }}" class="btn-analyze" style="background-color: #6c757d;">Historial</a>
+        </div>
+    </div>
+
+    <!-- Bloque para mostrar mensajes de notificación -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <p>Selecciona un canal para iniciar el análisis. El proceso puede tardar hasta 2 minutos.</p>
     <hr>
     {% for channel in channels %}
         <div class="channel">
             <span class="channel-name">{{ channel.channel_name }}</span>
-            <a href="{{ url_for('start_analysis', channel_id=channel.channel_id) }}" class="btn">Analizar</a>
+            <div class="actions">
+                <a href="{{ url_for('start_analysis', channel_id=channel.channel_id) }}" class="btn-analyze">Analizar</a>
+                <form action="{{ url_for('delete_channel', channel_id=channel.channel_id) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres borrar este canal?');">
+                    <button type="submit" class="btn-delete">Borrar</button>
+                </form>
+            </div>
         </div>
     {% else %}
-        <p>No se encontraron canales en la base de datos.</p>
+        <p>No se encontraron canales. ¡Añade uno para empezar!</p>
     {% endfor %}
 </body>
 </html>

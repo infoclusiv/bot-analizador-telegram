@@ -82,3 +82,39 @@ def get_channel_videos_last_week(channel_id, include_shorts=False):
         return []
         
     return videos_data
+
+def add_channel_to_db(channel_name, channel_id, category="Noticias"):
+    """Añade un nuevo canal a la base de datos. Devuelve (éxito, mensaje)."""
+    if not channel_name or not channel_id:
+        return (False, "El nombre y el ID del canal no pueden estar vacíos.")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO channels (channel_name, channel_id, category) VALUES (?, ?, ?)",
+            (channel_name, channel_id, category)
+        )
+        conn.commit()
+        return (True, f"¡Canal '{channel_name}' añadido con éxito!")
+    except libsql.IntegrityError:
+        return (False, "Error: Ese ID de canal ya existe en la base de datos.")
+    except Exception as e:
+        return (False, f"Ocurrió un error inesperado: {e}")
+    finally:
+        conn.close()
+
+def delete_channel_from_db(channel_id):
+    """Borra un canal de la base de datos por su ID. Devuelve (éxito, mensaje)."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM channels WHERE channel_id = ?", (channel_id,))
+    conn.commit()
+    
+    success = cursor.rows_affected > 0
+    conn.close()
+    
+    if success:
+        return (True, f"¡Canal con ID '{channel_id}' borrado con éxito!")
+    else:
+        return (False, f"No se encontró ningún canal con el ID '{channel_id}'.")
