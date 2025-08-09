@@ -1,0 +1,5 @@
+# Ignorar archivos de entorno, bases de datos locales y cachés
+.env
+channels.db
+__pycache__/
+*.pyc
