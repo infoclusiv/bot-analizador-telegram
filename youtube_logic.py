@@ -12,7 +12,7 @@ DB_URL = os.getenv("DB_URL")
 DB_AUTH_TOKEN = os.getenv("DB_AUTH_TOKEN")
 
 # El prompt que usaremos para el análisis
-GROK_ECONOMIC_CONCERN = """Analyze the provided JSON data and tell me, based on the number of views of the videos, what could be the topic of greatest concern for Americans regarding their economy? Use the data contained in the file. Also, give me the titles, links and number of views of the videos related to that topic. Present the final answer in Spanish."""
+GROK_ECONOMIC_CONCERN = """Analyze the provided JSON data and tell me, based on the number of views of the videos, what could be the topic of greatest concern for Americans regarding their economy? Use the data contained in the file. Also, give me the titles, links and number of views of the videos related to that topic. Sort the videos by views in descending order. Present the final answer in Spanish."""
 
 youtube = None
 if YOUTUBE_API_KEY:
