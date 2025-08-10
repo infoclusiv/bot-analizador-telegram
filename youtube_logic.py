@@ -28,7 +28,6 @@ def get_db_connection():
     if not all([DB_URL, DB_AUTH_TOKEN]):
         raise ValueError("DB_URL y DB_AUTH_TOKEN deben estar configurados en el archivo .env")
     conn = libsql.connect(database=DB_URL, auth_token=DB_AUTH_TOKEN)
-    # LA LÍNEA QUE DABA EL ERROR HA SIDO ELIMINADA DE AQUÍ
     return conn
 
 def get_all_saved_channels():
@@ -38,7 +37,6 @@ def get_all_saved_channels():
     cursor.execute('SELECT channel_id, channel_name FROM channels ORDER BY channel_name')
     channels_raw = cursor.fetchall()
     conn.close()
-    # AJUSTE: Convertimos manualmente los resultados a diccionarios
     return [{'channel_id': row[0], 'channel_name': row[1]} for row in channels_raw]
 
 def get_channel_name_from_db(channel_id):
@@ -47,36 +45,69 @@ def get_channel_name_from_db(channel_id):
     cursor.execute('SELECT channel_name FROM channels WHERE channel_id = ?', (channel_id,))
     channel = cursor.fetchone()
     conn.close()
-    # AJUSTE: Accedemos al resultado por su posición (0) en lugar de por nombre
     return channel[0] if channel else None
 
+# --- FUNCIÓN CORREGIDA ---
 def get_channel_videos_last_week(channel_id, include_shorts=False):
-    """Obtiene los videos de un canal de los últimos 3 días."""
+    """
+    Obtiene los videos de un canal de los últimos 3 días.
+    *** CORREGIDO: Ahora maneja la paginación para obtener TODOS los videos. ***
+    """
     if not youtube:
         raise ConnectionError("La API de YouTube no está inicializada.")
         
     three_days_ago = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat().replace('+00:00', 'Z')
-    videos_data = []
+    
+    all_video_ids = []
+    next_page_token = None
     
     try:
-        search_response = youtube.search().list(
-            part='id', channelId=channel_id, publishedAfter=three_days_ago,
-            type='video', order='date', maxResults=50
-        ).execute()
+        # **INICIO DE LA CORRECCIÓN: Bucle de paginación**
+        # Este bucle se ejecutará mientras la API de YouTube indique que hay más páginas de resultados.
+        while True:
+            search_response = youtube.search().list(
+                part='id',
+                channelId=channel_id,
+                publishedAfter=three_days_ago,
+                type='video',
+                order='date',
+                maxResults=50, # 50 es el máximo permitido por la API por página
+                pageToken=next_page_token # Envía el token de la página anterior para obtener la siguiente
+            ).execute()
+            
+            # Añade los IDs de video de la página actual a nuestra lista completa
+            page_video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
+            all_video_ids.extend(page_video_ids)
+            
+            # Obtenemos el token para la siguiente página. Si no existe, salimos del bucle.
+            next_page_token = search_response.get('nextPageToken')
+            if not next_page_token:
+                break
+        # **FIN DE LA CORRECCIÓN**
+
+        if not all_video_ids:
+            return []
         
-        video_ids = [item['id']['videoId'] for item in search_response.get('items', [])]
-        if not video_ids: return []
-        
-        video_details_response = youtube.videos().list(
-            part='snippet,statistics', id=','.join(video_ids)
-        ).execute()
-        
-        for item in video_details_response.get('items', []):
-            videos_data.append({
-                'title': item['snippet']['title'],
-                'views': int(item['statistics'].get('viewCount', 0)),
-                'url': f"https://www.youtube.com/watch?v={item['id']}"
-            })
+        # Ahora que tenemos TODOS los IDs, pedimos sus detalles.
+        # La API de videos.list puede aceptar hasta 50 IDs a la vez, por lo que si
+        # tenemos más, debemos hacer la petición en lotes.
+        videos_data = []
+        for i in range(0, len(all_video_ids), 50):
+            batch_ids = all_video_ids[i:i+50]
+            video_details_response = youtube.videos().list(
+                part='snippet,statistics', # Nota: No se pide 'contentDetails', por lo que no se puede filtrar por duración.
+                id=','.join(batch_ids)
+            ).execute()
+            
+            for item in video_details_response.get('items', []):
+                # El parámetro 'include_shorts' no tiene efecto aquí porque no obtenemos la duración del video.
+                # El comportamiento original se mantiene, pero ahora sobre la lista completa de videos.
+                videos_data.append({
+                    'title': item['snippet']['title'],
+                    'views': int(item['statistics'].get('viewCount', 0)),
+                    'url': f"https://www.youtube.com/watch?v={item['id']}"
+                })
+
     except Exception as e:
         print(f"Error al obtener videos de YouTube para {channel_id}: {e}")
         return []
