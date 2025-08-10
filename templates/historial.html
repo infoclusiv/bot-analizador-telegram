@@ -6,25 +6,32 @@
     <title>Historial de Análisis</title>
     <style>
         body { font-family: sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
         th { background-color: #f2f2f2; }
         .status-completed { color: green; font-weight: bold; }
         .status-failed { color: red; font-weight: bold; }
         .status-pending { color: orange; font-weight: bold; }
-        .btn { background-color: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; }
+        .actions-cell { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn, .btn-download { display: inline-block; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; text-align: center; }
+        .btn { background-color: #007bff; }
+        .btn-download { background-color: #17a2b8; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
-    <h1>Historial de Análisis</h1>
-    <p><a href="/">Volver al inicio para un nuevo análisis</a></p>
+    <div class="top-nav">
+        <h1>Historial de Análisis</h1>
+        <a href="/" class="btn">Nuevo Análisis</a>
+    </div>
+    
     <table>
         <thead>
             <tr>
                 <th>Fecha</th>
                 <th>Canal Analizado</th>
                 <th>Estado</th>
-                <th>Acción</th>
+                <th style="width: 250px;">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -35,17 +42,18 @@
                 <td>
                     <span class="status-{{ job[2] }}">{{ job[2] }}</span>
                 </td>
-                <td>
-                    {% if job[2] == 'completed' or job[2] == 'failed' %}
-                    <a href="{{ url_for('show_result', job_id=job[0]) }}" class="btn">Ver Resultado</a>
-                    {% else %}
-                    <a href="{{ url_for('show_result', job_id=job[0]) }}" class="btn">Ver Progreso</a>
+                <td class="actions-cell">
+                    <a href="{{ url_for('show_result', job_id=job[0]) }}" class="btn">
+                        {% if job[2] == 'pending' %}Ver Progreso{% else %}Ver Resultado{% endif %}
+                    </a>
+                    {% if job[2] == 'completed' %}
+                    <a href="{{ url_for('download_json', job_id=job[0]) }}" class="btn-download">Descargar JSON</a>
                     {% endif %}
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="4">Aún no se ha realizado ningún análisis.</td>
+                <td colspan="4" style="text-align: center;">Aún no se ha realizado ningún análisis.</td>
             </tr>
             {% endfor %}
         </tbody>

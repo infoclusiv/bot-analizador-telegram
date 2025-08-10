@@ -6,10 +6,13 @@
     <title>Resultado del Análisis</title>
     <style>
         body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        #result-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; }
+        #result-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; min-height: 150px; }
         .loading { text-align: center; }
-        pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; }
-        .error { color: red; }
+        .loading p { font-size: 1.1em; color: #555; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; background-color: #fff; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }
+        .error { color: red; font-weight: bold; }
+        .btn { display: inline-block; background-color: #17a2b8; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-top: 15px; }
+        a { color: #007bff; }
     </style>
 </head>
 <body>
@@ -26,22 +29,32 @@
 
     <script>
         const jobId = "{{ job_id }}";
-        
+        const channelName = "{{ channel_name }}";
+
         async function checkStatus() {
             try {
                 const response = await fetch(`/status/${jobId}`);
+                if (!response.ok) {
+                    throw new Error(`Error en la respuesta del servidor: ${response.status}`);
+                }
                 const data = await response.json();
 
                 if (data.status === 'completed') {
                     clearInterval(intervalId);
                     const container = document.getElementById('result-container');
-                    container.innerHTML = `<h3>Análisis Completado</h3><pre>${data.result}</pre>`;
+                    
+                    // Crea el HTML para el resultado y el botón de descarga
+                    let resultHTML = `<h3>Análisis Completado para: ${channelName}</h3><pre>${data.result}</pre>`;
+                    resultHTML += `<hr><a href="/download/${jobId}" class="btn">Descargar JSON de Datos</a>`;
+
+                    container.innerHTML = resultHTML;
+
                 } else if (data.status === 'failed') {
                     clearInterval(intervalId);
                     const container = document.getElementById('result-container');
                     container.innerHTML = `<h3 class="error">El Análisis Falló</h3><p>Motivo: ${data.result}</p>`;
                 }
-                // Si está 'pending', no hacemos nada y dejamos que el intervalo siga.
+                // Si está 'pending' o 'not_found', no hacemos nada y dejamos que el intervalo siga.
 
             } catch (error) {
                 console.error('Error al consultar el estado:', error);
