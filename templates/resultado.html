@@ -4,16 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultado del Análisis</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        #result-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; min-height: 150px; }
-        .loading { text-align: center; }
-        .loading p { font-size: 1.1em; color: #555; }
-        pre { white-space: pre-wrap; word-wrap: break-word; font-family: monospace; background-color: #fff; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }
-        .error { color: red; font-weight: bold; }
-        .btn { display: inline-block; background-color: #17a2b8; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-top: 15px; }
-        a { color: #007bff; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>Resultado del Análisis</h1>

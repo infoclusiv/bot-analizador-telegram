@@ -4,20 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial de Análisis</title>
-    <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
-        th { background-color: #f2f2f2; }
-        .status-completed { color: green; font-weight: bold; }
-        .status-failed { color: red; font-weight: bold; }
-        .status-pending { color: orange; font-weight: bold; }
-        .actions-cell { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn, .btn-download { display: inline-block; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; text-align: center; }
-        .btn { background-color: #007bff; }
-        .btn-download { background-color: #17a2b8; }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="top-nav">
