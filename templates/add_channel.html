@@ -14,13 +14,15 @@
     <!-- Header Principal -->
     <header class="header">
         <div class="header__container">
-            <div class="header__brand">
-                <svg class="header__logo" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-                </svg>
-                <h1 class="header__title">Añadir Nuevo Canal</h1>
-            </div>
+            <a href="{{ url_for('index') }}" style="text-decoration: none; color: inherit;">
+                <div class="header__brand">
+                    <svg class="header__logo" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <h1 class="header__title">Añadir Nuevo Canal</h1>
+                </div>
+            </a>
             <nav class="header__nav" id="mobile-nav">
                 <a href="{{ url_for('index') }}" class="btn btn--secondary">
                     <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -108,9 +110,6 @@
                     </div>
                     <p class="form-helper">
                         El ID único del canal. Comienza con "UC" seguido de 22 caracteres.
-                        <button type="button" class="form-helper__link" onclick="showHelpModal()">
-                            ¿Cómo encontrar el ID?
-                        </button>
                     </p>
                 </div>
 
@@ -152,58 +151,6 @@
             </form>
         </div>
     </main>
-
-    <!-- Modal de ayuda -->
-    <div class="modal" id="help-modal">
-        <div class="modal__backdrop" onclick="closeHelpModal()"></div>
-        <div class="modal__content">
-            <div class="modal__header">
-                <h3 class="modal__title">¿Cómo encontrar el ID del canal?</h3>
-                <button class="modal__close" onclick="closeHelpModal()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="modal__body">
-                <div class="help-steps">
-                    <div class="help-step">
-                        <span class="help-step__number">1</span>
-                        <div class="help-step__content">
-                            <h4>Método 1: Desde la URL del canal</h4>
-                            <p>Ve al canal en YouTube. Si la URL es como:</p>
-                            <code class="help-code">youtube.com/channel/UCXXXXXXXXXXXXXXXXXXXXXX</code>
-                            <p>El ID es la parte después de "/channel/"</p>
-                        </div>
-                    </div>
-                    <div class="help-step">
-                        <span class="help-step__number">2</span>
-                        <div class="help-step__content">
-                            <h4>Método 2: Desde el código fuente</h4>
-                            <p>En la página del canal, haz clic derecho y selecciona "Ver código fuente"</p>
-                            <p>Busca (Ctrl+F) por: <code>"channelId"</code></p>
-                            <p>Encontrarás algo como:</p>
-                            <code class="help-code">"channelId":"UCXXXXXXXXXXXXXXXXXXXXXX"</code>
-                        </div>
-                    </div>
-                    <div class="help-step">
-                        <span class="help-step__number">3</span>
-                        <div class="help-step__content">
-                            <h4>Método 3: Usando herramientas online</h4>
-                            <p>Puedes usar sitios web como:</p>
-                            <ul>
-                                <li>commentpicker.com/youtube-channel-id.php</li>
-                                <li>youtube.com/account_advanced</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal__footer">
-                <button class="btn btn--primary" onclick="closeHelpModal()">Entendido</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Toast notification -->
     <div class="toast" id="toast">
@@ -283,17 +230,6 @@
                 this.classList.remove('form-input--error');
             }
         });
-
-        // Modal de ayuda
-        function showHelpModal() {
-            document.getElementById('help-modal').classList.add('modal--visible');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeHelpModal() {
-            document.getElementById('help-modal').classList.remove('modal--visible');
-            document.body.style.overflow = '';
-        }
 
         // Toast notifications
         function showToast(message, type = 'success') {

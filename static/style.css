@@ -1578,7 +1578,7 @@ body::before {
 }
 
 /* ========================================
-   ESTILOS DEL FORMULARIO DE AÑADIR CANAL (CORREGIDO)
+   ESTILOS DEL FORMULARIO DE AÑADIR CANAL (SIN MODAL)
    ======================================== */
 
 /* Contenedor principal centrado */
@@ -1636,10 +1636,9 @@ body::before {
   padding: var(--spacing-xl);
 }
 
-/* Grupos de formulario - CORREGIDO: Sin animación inicial */
+/* Grupos de formulario */
 .form-group {
   margin-bottom: var(--spacing-lg);
-  /* Removida la opacidad 0 y animación que ocultaba los campos */
 }
 
 /* Labels */
@@ -1667,7 +1666,7 @@ body::before {
   position: relative;
 }
 
-/* Inputs - ASEGURAR VISIBILIDAD */
+/* Inputs */
 .form-input {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -1677,7 +1676,6 @@ body::before {
   background: var(--color-surface);
   transition: var(--transition);
   color: var(--color-text-primary);
-  /* Asegurar que los inputs sean visibles y utilizables */
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -1710,22 +1708,6 @@ body::before {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   line-height: 1.5;
-}
-
-.form-helper__link {
-  color: var(--color-primary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: inherit;
-  padding: 0;
-  margin-left: var(--spacing-xs);
-  transition: var(--transition);
-}
-
-.form-helper__link:hover {
-  color: var(--color-primary-dark);
 }
 
 /* Vista previa del canal */
@@ -1810,7 +1792,14 @@ body::before {
   font-size: var(--font-size-base);
 }
 
-/* El resto del CSS del modal y responsive se mantiene igual... */
+/* Variantes del toast */
+.toast--error {
+  background: var(--color-danger);
+}
+
+.toast--info {
+  background: var(--color-primary);
+}
 
 /* ========================================
    RESPONSIVE PARA FORMULARIO
@@ -1840,27 +1829,4 @@ body::before {
   .form-actions .btn {
     width: 100%;
   }
-  
-  .suggested-channels__grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .modal__content {
-    width: 95%;
-    max-height: 95vh;
-  }
-  
-  .help-step {
-    flex-direction: column;
-  }
-}
-
-/* Animación de entrada */
-.fade-in {
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
