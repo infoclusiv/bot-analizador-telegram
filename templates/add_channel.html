@@ -152,25 +152,6 @@
                     </a>
                 </div>
             </form>
-
-            <!-- Canales sugeridos (opcional) -->
-            <div class="suggested-channels">
-                <h3 class="suggested-channels__title">Canales Populares para Empezar</h3>
-                <div class="suggested-channels__grid">
-                    <button type="button" class="suggested-channel" onclick="fillChannel('MrBeast', 'UCX6OQ3DkcsbYNE6H8uQQuVA')">
-                        <span class="suggested-channel__avatar">M</span>
-                        <span class="suggested-channel__name">MrBeast</span>
-                    </button>
-                    <button type="button" class="suggested-channel" onclick="fillChannel('PewDiePie', 'UC-lHJZR3Gqxm24_Vd_AJ5Yw')">
-                        <span class="suggested-channel__avatar">P</span>
-                        <span class="suggested-channel__name">PewDiePie</span>
-                    </button>
-                    <button type="button" class="suggested-channel" onclick="fillChannel('T-Series', 'UCq-Fj5jknLsUf-MWSy4_brA')">
-                        <span class="suggested-channel__avatar">T</span>
-                        <span class="suggested-channel__name">T-Series</span>
-                    </button>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -307,24 +288,6 @@
                 this.classList.remove('form-input--error');
             }
         });
-
-        // Autocompletar desde canales sugeridos
-        function fillChannel(name, id) {
-            channelNameInput.value = name;
-            channelIdInput.value = id;
-            updatePreview();
-            
-            // Animar los campos
-            channelNameInput.classList.add('form-input--filled');
-            channelIdInput.classList.add('form-input--filled');
-            
-            setTimeout(() => {
-                channelNameInput.classList.remove('form-input--filled');
-                channelIdInput.classList.remove('form-input--filled');
-            }, 500);
-            
-            showToast('Canal prellenado. Haz clic en Guardar para continuar', 'info');
-        }
 
         // Modal de ayuda
         function showHelpModal() {
