@@ -3,23 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Añadir Nuevo Canal</title>
+    <title>Añadir Nuevo Canal - Analizador de YouTube</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Añadir Nuevo Canal</h1>
-    <form action="{{ url_for('add_channel') }}" method="POST">
-        <div>
-            <label for="channel_name">Nombre del Canal:</label>
-            <input type="text" id="channel_name" name="channel_name" required>
+    <!-- Header Principal -->
+    <header class="header">
+        <div class="header__container">
+            <div class="header__brand">
+                <svg class="header__logo" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h1 class="header__title">Añadir Nuevo Canal</h1>
+            </div>
+            <nav class="header__nav" id="mobile-nav">
+                <a href="{{ url_for('index') }}" class="btn btn--secondary">
+                    <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Inicio
+                </a>
+                <a href="{{ url_for('historial') }}" class="btn btn--secondary">
+                    <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Historial
+                </a>
+            </nav>
+            <button class="header__menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-        <div>
-            <label for="channel_id">ID del Canal:</label>
-            <input type="text" id="channel_id" name="channel_id" placeholder="Ej: UCXXXXXXXXXXXXXXXXXXXXXX" required>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="main-container main-container--centered">
+        <div class="form-container">
+            <!-- Encabezado del formulario -->
+            <div class="form-header">
+                <div class="form-header__icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2 class="form-header__title">Agregar Canal de YouTube</h2>
+                <p class="form-header__description">
+                    Ingresa la información del canal que deseas analizar. Necesitarás el nombre del canal y su ID único.
+                </p>
+            </div>
+
+            <!-- Formulario -->
+            <form action="{{ url_for('add_channel') }}" method="POST" class="form" id="add-channel-form">
+                <!-- Campo: Nombre del Canal -->
+                <div class="form-group">
+                    <label for="channel_name" class="form-label">
+                        <svg class="form-label__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Nombre del Canal
+                        <span class="form-label__required">*</span>
+                    </label>
+                    <div class="form-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="channel_name" 
+                            name="channel_name" 
+                            class="form-input"
+                            placeholder="Ej: MrBeast, PewDiePie, etc."
+                            required
+                            autocomplete="off"
+                        >
+                        <span class="form-input__focus-border"></span>
+                    </div>
+                    <p class="form-helper">El nombre público del canal como aparece en YouTube</p>
+                </div>
+
+                <!-- Campo: ID del Canal -->
+                <div class="form-group">
+                    <label for="channel_id" class="form-label">
+                        <svg class="form-label__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        ID del Canal
+                        <span class="form-label__required">*</span>
+                    </label>
+                    <div class="form-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="channel_id" 
+                            name="channel_id" 
+                            class="form-input form-input--mono"
+                            placeholder="UCXXXXXXXXXXXXXXXXXXXXXX"
+                            pattern="UC[a-zA-Z0-9_-]{22}"
+                            title="El ID debe comenzar con 'UC' seguido de 22 caracteres"
+                            required
+                            autocomplete="off"
+                        >
+                        <span class="form-input__focus-border"></span>
+                    </div>
+                    <p class="form-helper">
+                        El ID único del canal. Comienza con "UC" seguido de 22 caracteres.
+                        <button type="button" class="form-helper__link" onclick="showHelpModal()">
+                            ¿Cómo encontrar el ID?
+                        </button>
+                    </p>
+                </div>
+
+                <!-- Vista previa del canal (opcional, aparece después de ingresar datos) -->
+                <div class="channel-preview" id="channel-preview" style="display: none;">
+                    <div class="channel-preview__header">
+                        <svg class="channel-preview__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Vista previa
+                    </div>
+                    <div class="channel-preview__content">
+                        <div class="channel-preview__avatar" id="preview-avatar">
+                            <span id="preview-initial">-</span>
+                        </div>
+                        <div class="channel-preview__info">
+                            <span class="channel-preview__name" id="preview-name">-</span>
+                            <span class="channel-preview__id" id="preview-id">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary btn--gradient btn--large">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Guardar Canal
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn--secondary btn--large">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+
+            <!-- Canales sugeridos (opcional) -->
+            <div class="suggested-channels">
+                <h3 class="suggested-channels__title">Canales Populares para Empezar</h3>
+                <div class="suggested-channels__grid">
+                    <button type="button" class="suggested-channel" onclick="fillChannel('MrBeast', 'UCX6OQ3DkcsbYNE6H8uQQuVA')">
+                        <span class="suggested-channel__avatar">M</span>
+                        <span class="suggested-channel__name">MrBeast</span>
+                    </button>
+                    <button type="button" class="suggested-channel" onclick="fillChannel('PewDiePie', 'UC-lHJZR3Gqxm24_Vd_AJ5Yw')">
+                        <span class="suggested-channel__avatar">P</span>
+                        <span class="suggested-channel__name">PewDiePie</span>
+                    </button>
+                    <button type="button" class="suggested-channel" onclick="fillChannel('T-Series', 'UCq-Fj5jknLsUf-MWSy4_brA')">
+                        <span class="suggested-channel__avatar">T</span>
+                        <span class="suggested-channel__name">T-Series</span>
+                    </button>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn">Guardar Canal</button>
-    </form>
-    <hr>
-    <p><a href="{{ url_for('index') }}">Cancelar y volver al inicio</a></p>
+    </main>
+
+    <!-- Modal de ayuda -->
+    <div class="modal" id="help-modal">
+        <div class="modal__backdrop" onclick="closeHelpModal()"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 class="modal__title">¿Cómo encontrar el ID del canal?</h3>
+                <button class="modal__close" onclick="closeHelpModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal__body">
+                <div class="help-steps">
+                    <div class="help-step">
+                        <span class="help-step__number">1</span>
+                        <div class="help-step__content">
+                            <h4>Método 1: Desde la URL del canal</h4>
+                            <p>Ve al canal en YouTube. Si la URL es como:</p>
+                            <code class="help-code">youtube.com/channel/UCXXXXXXXXXXXXXXXXXXXXXX</code>
+                            <p>El ID es la parte después de "/channel/"</p>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <span class="help-step__number">2</span>
+                        <div class="help-step__content">
+                            <h4>Método 2: Desde el código fuente</h4>
+                            <p>En la página del canal, haz clic derecho y selecciona "Ver código fuente"</p>
+                            <p>Busca (Ctrl+F) por: <code>"channelId"</code></p>
+                            <p>Encontrarás algo como:</p>
+                            <code class="help-code">"channelId":"UCXXXXXXXXXXXXXXXXXXXXXX"</code>
+                        </div>
+                    </div>
+                    <div class="help-step">
+                        <span class="help-step__number">3</span>
+                        <div class="help-step__content">
+                            <h4>Método 3: Usando herramientas online</h4>
+                            <p>Puedes usar sitios web como:</p>
+                            <ul>
+                                <li>commentpicker.com/youtube-channel-id.php</li>
+                                <li>youtube.com/account_advanced</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--primary" onclick="closeHelpModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <svg class="toast__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="toast__message">Canal agregado exitosamente</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__container">
+            <p class="footer__text">© 2024 Analizador de YouTube. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Menú móvil
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        
+        if (menuToggle && mobileNav) {
+            menuToggle.addEventListener('click', function() {
+                const isOpen = mobileNav.classList.contains('active');
+                mobileNav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+                menuToggle.setAttribute('aria-expanded', !isOpen);
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !mobileNav.contains(event.target)) {
+                    mobileNav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // Vista previa en tiempo real
+        const channelNameInput = document.getElementById('channel_name');
+        const channelIdInput = document.getElementById('channel_id');
+        const channelPreview = document.getElementById('channel-preview');
+        const previewName = document.getElementById('preview-name');
+        const previewId = document.getElementById('preview-id');
+        const previewInitial = document.getElementById('preview-initial');
+
+        function updatePreview() {
+            const name = channelNameInput.value.trim();
+            const id = channelIdInput.value.trim();
+
+            if (name || id) {
+                channelPreview.style.display = 'block';
+                previewName.textContent = name || 'Sin nombre';
+                previewId.textContent = id || 'Sin ID';
+                previewInitial.textContent = name ? name[0].toUpperCase() : '?';
+            } else {
+                channelPreview.style.display = 'none';
+            }
+        }
+
+        channelNameInput.addEventListener('input', updatePreview);
+        channelIdInput.addEventListener('input', updatePreview);
+
+        // Validación del ID en tiempo real
+        channelIdInput.addEventListener('input', function() {
+            const value = this.value;
+            const isValid = /^UC[a-zA-Z0-9_-]{22}$/.test(value);
+            
+            if (value && !value.startsWith('UC')) {
+                this.classList.add('form-input--error');
+                showToast('El ID debe comenzar con "UC"', 'error');
+            } else if (value && value.length === 24 && !isValid) {
+                this.classList.add('form-input--error');
+                showToast('El ID contiene caracteres inválidos', 'error');
+            } else if (value && value.length > 24) {
+                this.classList.add('form-input--error');
+                showToast('El ID es demasiado largo', 'error');
+            } else {
+                this.classList.remove('form-input--error');
+            }
+        });
+
+        // Autocompletar desde canales sugeridos
+        function fillChannel(name, id) {
+            channelNameInput.value = name;
+            channelIdInput.value = id;
+            updatePreview();
+            
+            // Animar los campos
+            channelNameInput.classList.add('form-input--filled');
+            channelIdInput.classList.add('form-input--filled');
+            
+            setTimeout(() => {
+                channelNameInput.classList.remove('form-input--filled');
+                channelIdInput.classList.remove('form-input--filled');
+            }, 500);
+            
+            showToast('Canal prellenado. Haz clic en Guardar para continuar', 'info');
+        }
+
+        // Modal de ayuda
+        function showHelpModal() {
+            document.getElementById('help-modal').classList.add('modal--visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.remove('modal--visible');
+            document.body.style.overflow = '';
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = toast.querySelector('.toast__message');
+            const toastIcon = toast.querySelector('.toast__icon');
+            
+            toastMessage.textContent = message;
+            
+            // Cambiar icono según el tipo
+            if (type === 'error') {
+                toast.classList.add('toast--error');
+                toastIcon.innerHTML = '<path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+            } else if (type === 'info') {
+                toast.classList.add('toast--info');
+                toastIcon.innerHTML = '<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+            }
+            
+            toast.classList.add('toast--visible');
+            
+            setTimeout(() => {
+                toast.classList.remove('toast--visible', 'toast--error', 'toast--info');
+            }, 3000);
+        }
+
+        // Validación del formulario antes de enviar
+        document.getElementById('add-channel-form').addEventListener('submit', function(e) {
+            const channelId = channelIdInput.value;
+            const isValidId = /^UC[a-zA-Z0-9_-]{22}$/.test(channelId);
+            
+            if (!isValidId) {
+                e.preventDefault();
+                showToast('Por favor, ingresa un ID de canal válido', 'error');
+                channelIdInput.focus();
+                channelIdInput.classList.add('form-input--error');
+            }
+        });
+
+        // Animación de entrada de los elementos
+        window.addEventListener('load', function() {
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                group.style.animationDelay = `${index * 0.1}s`;
+                group.classList.add('fade-in');
+            });
+        });
+    </script>
 </body>
 </html>

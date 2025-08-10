@@ -3,25 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado del Análisis</title>
+    <title>Resultado del Análisis - {{ channel_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Resultado del Análisis</h1>
-    <div id="result-container">
-        <div class="loading">
-            <h3>Análisis en progreso para: {{ channel_name }}</h3>
-            <p>Por favor, espera. Los resultados aparecerán aquí automáticamente.</p>
-            <p><strong>Job ID:</strong> {{ job_id }}</p>
+    <!-- Header Principal -->
+    <header class="header">
+        <div class="header__container">
+            <div class="header__brand">
+                <svg class="header__logo" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <h1 class="header__title">Resultado del Análisis</h1>
+            </div>
+            <nav class="header__nav" id="mobile-nav">
+                <a href="/" class="btn btn--secondary">
+                    <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Inicio
+                </a>
+                <a href="{{ url_for('historial') }}" class="btn btn--primary btn--gradient">
+                    <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Ver Historial
+                </a>
+            </nav>
+            <button class="header__menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-    </div>
-    <hr>
-    <a href="{{ url_for('historial') }}">Volver al Historial</a>
+    </header>
 
+    <!-- Contenedor Principal -->
+    <main class="main-container">
+        <!-- Información del Canal -->
+        <section class="result-header">
+            <div class="result-header__content">
+                <div class="result-header__channel">
+                    <div class="channel-avatar channel-avatar--large">
+                        {{ channel_name[0]|upper if channel_name else 'A' }}
+                    </div>
+                    <div class="result-header__info">
+                        <h2 class="result-header__title">{{ channel_name }}</h2>
+                        <div class="result-header__meta">
+                            <span class="meta-item">
+                                <svg class="meta-item__icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Job ID: <code>{{ job_id[:8] }}...</code>
+                            </span>
+                            <span class="meta-item" id="elapsed-time">
+                                <svg class="meta-item__icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span id="timer">00:00</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-header__status" id="status-indicator">
+                    <span class="status-badge status-badge--pending status-badge--large">
+                        <svg class="status-badge__icon status-badge__icon--spinning" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Analizando
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contenedor de Resultados -->
+        <section class="result-section" id="result-container">
+            <!-- Estado inicial: Cargando -->
+            <div class="loading-state" id="loading-state">
+                <div class="loading-animation">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-progress">
+                        <div class="loading-progress__bar" id="progress-bar"></div>
+                    </div>
+                </div>
+                <h3 class="loading-state__title">Análisis en progreso</h3>
+                <p class="loading-state__description">
+                    Estamos procesando los datos del canal. Esto puede tomar hasta 2 minutos dependiendo del tamaño del canal.
+                </p>
+                <div class="loading-state__steps">
+                    <div class="step step--active" id="step-1">
+                        <svg class="step__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Conectando con YouTube API</span>
+                    </div>
+                    <div class="step" id="step-2">
+                        <svg class="step__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Descargando información del canal</span>
+                    </div>
+                    <div class="step" id="step-3">
+                        <svg class="step__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Procesando y analizando datos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado de éxito (se mostrará cuando complete) -->
+            <div class="result-success" id="result-success" style="display: none;">
+                <div class="result-success__header">
+                    <div class="success-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="result-success__title">¡Análisis Completado!</h3>
+                    <p class="result-success__description">
+                        El análisis del canal se ha completado exitosamente. Puedes ver los resultados a continuación o descargarlos en formato JSON.
+                    </p>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="result-actions">
+                    <button class="btn btn--primary btn--gradient" onclick="copyToClipboard()">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Copiar Resultado
+                    </button>
+                    <a href="/download/{{ job_id }}" class="btn btn--success" id="download-btn">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Descargar JSON
+                    </a>
+                    <button class="btn btn--secondary" onclick="toggleFullscreen()">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Pantalla Completa
+                    </button>
+                </div>
+
+                <!-- Contenedor del resultado -->
+                <div class="result-content">
+                    <div class="result-content__toolbar">
+                        <span class="result-content__label">Resultado del Análisis</span>
+                        <div class="result-content__controls">
+                            <button class="control-btn" onclick="decreaseFontSize()" title="Reducir tamaño">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <button class="control-btn" onclick="increaseFontSize()" title="Aumentar tamaño">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <button class="control-btn" onclick="toggleLineWrap()" title="Ajuste de línea">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 10h18M3 14h18m-9-4v8m0 0l3-3m-3 3l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <pre class="result-content__data" id="result-data"></pre>
+                </div>
+            </div>
+
+            <!-- Estado de error (se mostrará si falla) -->
+            <div class="result-error" id="result-error" style="display: none;">
+                <div class="error-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="result-error__title">Error en el Análisis</h3>
+                <p class="result-error__description" id="error-message">
+                    Ha ocurrido un error durante el análisis del canal.
+                </p>
+                <div class="result-error__actions">
+                    <a href="/" class="btn btn--primary btn--gradient">
+                        <svg class="btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Intentar de Nuevo
+                    </a>
+                    <a href="{{ url_for('historial') }}" class="btn btn--secondary">
+                        Ver Historial
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Toast de notificación -->
+        <div class="toast" id="toast">
+            <svg class="toast__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="toast__message">Copiado al portapapeles</span>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__container">
+            <p class="footer__text">© 2024 Analizador de YouTube. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript mejorado -->
     <script>
         const jobId = "{{ job_id }}";
         const channelName = "{{ channel_name }}";
+        let startTime = Date.now();
+        let timerInterval;
+        let progressInterval;
+        let currentStep = 1;
+        let fontSize = 14;
 
+        // Iniciar timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Animación de progreso
+        function startProgressAnimation() {
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90; // No llegar al 100% hasta completar
+                progressBar.style.width = `${progress}%`;
+                
+                // Actualizar pasos
+                if (progress > 30 && currentStep === 1) {
+                    currentStep = 2;
+                    document.getElementById('step-1').classList.add('step--completed');
+                    document.getElementById('step-2').classList.add('step--active');
+                }
+                if (progress > 60 && currentStep === 2) {
+                    currentStep = 3;
+                    document.getElementById('step-2').classList.add('step--completed');
+                    document.getElementById('step-3').classList.add('step--active');
+                }
+            }, 1000);
+        }
+
+        // Verificar estado del análisis
         async function checkStatus() {
             try {
                 const response = await fetch(`/status/${jobId}`);
@@ -32,34 +275,126 @@
 
                 if (data.status === 'completed') {
                     clearInterval(intervalId);
-                    const container = document.getElementById('result-container');
+                    clearInterval(timerInterval);
+                    clearInterval(progressInterval);
                     
-                    // Crea el HTML para el resultado y el botón de descarga
-                    let resultHTML = `<h3>Análisis Completado para: ${channelName}</h3><pre>${data.result}</pre>`;
-                    resultHTML += `<hr><a href="/download/${jobId}" class="btn">Descargar JSON de Datos</a>`;
-
-                    container.innerHTML = resultHTML;
+                    // Completar animación
+                    document.getElementById('progress-bar').style.width = '100%';
+                    document.getElementById('step-3').classList.add('step--completed');
+                    
+                    // Actualizar badge de estado
+                    const statusIndicator = document.getElementById('status-indicator');
+                    statusIndicator.innerHTML = `
+                        <span class="status-badge status-badge--success status-badge--large">
+                            <svg class="status-badge__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Completado
+                        </span>
+                    `;
+                    
+                    // Mostrar resultados con transición
+                    setTimeout(() => {
+                        document.getElementById('loading-state').style.display = 'none';
+                        document.getElementById('result-success').style.display = 'block';
+                        document.getElementById('result-data').textContent = data.result;
+                    }, 500);
 
                 } else if (data.status === 'failed') {
                     clearInterval(intervalId);
-                    const container = document.getElementById('result-container');
-                    container.innerHTML = `<h3 class="error">El Análisis Falló</h3><p>Motivo: ${data.result}</p>`;
+                    clearInterval(timerInterval);
+                    clearInterval(progressInterval);
+                    
+                    // Actualizar badge de estado
+                    const statusIndicator = document.getElementById('status-indicator');
+                    statusIndicator.innerHTML = `
+                        <span class="status-badge status-badge--error status-badge--large">
+                            <svg class="status-badge__icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Error
+                        </span>
+                    `;
+                    
+                    // Mostrar error
+                    document.getElementById('loading-state').style.display = 'none';
+                    document.getElementById('result-error').style.display = 'block';
+                    document.getElementById('error-message').textContent = `Motivo: ${data.result}`;
                 }
-                // Si está 'pending' o 'not_found', no hacemos nada y dejamos que el intervalo siga.
 
             } catch (error) {
                 console.error('Error al consultar el estado:', error);
                 clearInterval(intervalId);
-                const container = document.getElementById('result-container');
-                container.innerHTML = `<h3 class="error">Error de Conexión</h3><p>No se pudo comunicar con el servidor para obtener el resultado.</p>`;
+                clearInterval(timerInterval);
+                clearInterval(progressInterval);
+                
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('result-error').style.display = 'block';
+                document.getElementById('error-message').textContent = 
+                    'No se pudo comunicar con el servidor para obtener el resultado.';
             }
         }
 
-        // Preguntar por el estado cada 5 segundos
-        const intervalId = setInterval(checkStatus, 5000);
+        // Funciones de utilidad
+        function copyToClipboard() {
+            const resultText = document.getElementById('result-data').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                showToast('Resultado copiado al portapapeles');
+            });
+        }
 
-        // Hacemos una primera consulta inmediata para no esperar 5s si el resultado es muy rápido
-        checkStatus(); 
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('.toast__message').textContent = message;
+            toast.classList.add('toast--visible');
+            setTimeout(() => {
+                toast.classList.remove('toast--visible');
+            }, 3000);
+        }
+
+        function toggleFullscreen() {
+            const resultContent = document.querySelector('.result-content');
+            if (!document.fullscreenElement) {
+                resultContent.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function increaseFontSize() {
+            fontSize = Math.min(fontSize + 2, 24);
+            document.getElementById('result-data').style.fontSize = `${fontSize}px`;
+        }
+
+        function decreaseFontSize() {
+            fontSize = Math.max(fontSize - 2, 10);
+            document.getElementById('result-data').style.fontSize = `${fontSize}px`;
+        }
+
+        function toggleLineWrap() {
+            const resultData = document.getElementById('result-data');
+            resultData.style.whiteSpace = 
+                resultData.style.whiteSpace === 'pre' ? 'pre-wrap' : 'pre';
+        }
+
+        // Menú móvil
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        
+        if (menuToggle && mobileNav) {
+            menuToggle.addEventListener('click', function() {
+                const isOpen = mobileNav.classList.contains('active');
+                mobileNav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+                menuToggle.setAttribute('aria-expanded', !isOpen);
+            });
+        }
+
+        // Iniciar proceso
+        startTimer();
+        startProgressAnimation();
+        const intervalId = setInterval(checkStatus, 3000);
+        checkStatus(); // Primera verificación inmediata
     </script>
 </body>
 </html>
