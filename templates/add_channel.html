@@ -80,7 +80,6 @@
                             required
                             autocomplete="off"
                         >
-                        <span class="form-input__focus-border"></span>
                     </div>
                     <p class="form-helper">El nombre público del canal como aparece en YouTube</p>
                 </div>
@@ -106,7 +105,6 @@
                             required
                             autocomplete="off"
                         >
-                        <span class="form-input__focus-border"></span>
                     </div>
                     <p class="form-helper">
                         El ID único del canal. Comienza con "UC" seguido de 22 caracteres.
@@ -277,13 +275,10 @@
             
             if (value && !value.startsWith('UC')) {
                 this.classList.add('form-input--error');
-                showToast('El ID debe comenzar con "UC"', 'error');
             } else if (value && value.length === 24 && !isValid) {
                 this.classList.add('form-input--error');
-                showToast('El ID contiene caracteres inválidos', 'error');
             } else if (value && value.length > 24) {
                 this.classList.add('form-input--error');
-                showToast('El ID es demasiado largo', 'error');
             } else {
                 this.classList.remove('form-input--error');
             }
@@ -335,15 +330,6 @@
                 channelIdInput.focus();
                 channelIdInput.classList.add('form-input--error');
             }
-        });
-
-        // Animación de entrada de los elementos
-        window.addEventListener('load', function() {
-            const formGroups = document.querySelectorAll('.form-group');
-            formGroups.forEach((group, index) => {
-                group.style.animationDelay = `${index * 0.1}s`;
-                group.classList.add('fade-in');
-            });
         });
     </script>
 </body>
